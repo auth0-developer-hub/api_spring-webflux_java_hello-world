@@ -1,0 +1,12 @@
+---
+
+application:
+  client-origin-url: ${CLIENT_ORIGIN_URL}
+
+server:
+  error:
+    whitelabel:
+      enabled: false
+  port: ${PORT}
+
+...
