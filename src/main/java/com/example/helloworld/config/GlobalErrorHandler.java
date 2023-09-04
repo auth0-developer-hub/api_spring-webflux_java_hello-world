@@ -3,6 +3,7 @@ package com.example.helloworld.config;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
@@ -39,6 +40,16 @@ public record GlobalErrorHandler(ObjectMapper mapper) implements ErrorWebExcepti
         return response.writeWith(
                 this.makeBodyBytes(error.getMessage())
                         .map(bufferFactory::wrap));
+    }
+
+    public Mono<Void> handleAuthenticationError(final ServerWebExchange exchange, final AuthenticationException error) {
+        final var response = exchange.getResponse();
+        final var message = "Unauthorized. %s".formatted(error.getMessage());
+        final var body = this.makeBodyBytes(message)
+                .map(response.bufferFactory()::wrap);
+
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return response.writeWith(body);
     }
 
     private Mono<byte[]> makeBodyBytes(final String message) {
