@@ -3,6 +3,7 @@ package com.example.helloworld.config;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,6 +50,18 @@ public record GlobalErrorHandler(ObjectMapper mapper) implements ErrorWebExcepti
                 .map(response.bufferFactory()::wrap);
 
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return response.writeWith(body);
+    }
+
+    public Mono<Void> handleAccessDenied(
+            final ServerWebExchange exchange,
+            final AccessDeniedException error // NOSONAR
+    ) {
+        final var response = exchange.getResponse();
+        final var body = this.makeBodyBytes("Permission denied")
+                .map(response.bufferFactory()::wrap);
+
+        response.setStatusCode(HttpStatus.FORBIDDEN);
         return response.writeWith(body);
     }
 

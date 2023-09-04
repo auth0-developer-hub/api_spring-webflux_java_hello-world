@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import com.example.helloworld.annotations.CanReadAdminMessages;
 import com.example.helloworld.services.MessageService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class MessageHandler {
     }
 
     @Cacheable
+    @CanReadAdminMessages
     public Mono<ServerResponse> getAdmin(final ServerRequest request) {
         return messageService.makeAdminMessage()
                 .flatMap(ok()::bodyValue);
